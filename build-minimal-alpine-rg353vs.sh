@@ -22,7 +22,7 @@ die() { echo "error: $*" >&2; exit 1; }
 say() { printf '\n==> %s\n' "$*"; }
 [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ] && { sed -n '2,25p' "$0"; exit 0; }
 
-OUT=${1:-alpine-rg353vs-bare.img}
+OUT=${1:-alpine-rg353vs-minimal.img}
 ROCKNIX_TAG=${ROCKNIX_TAG:-20260901}  # set to desired version or "latest"
 ALPINE_BRANCH=${ALPINE_BRANCH:-v3.24} # set to desired version or "latest"
 ROOT_MB=${ROOT_MB:-512}
@@ -44,7 +44,7 @@ ROOT_START=$((BOOT_START + BOOT_SECTORS))
 ROOT_SECTORS=$((ROOT_MB * 2048))
 TOTAL_SECTORS=$((ROOT_START + ROOT_SECTORS + 2048))   # +1 MiB for backup GPT
 
-W=$(mktemp -d -p "${WORKDIR:-$PWD}" .rg353vs-bare.XXXXXX)
+W=$(mktemp -d -p "${WORKDIR:-$PWD}" .rg353vs-minimal.XXXXXX)
 trap 'rm -rf "$W"' EXIT
 
 # ---- 1. ROCKNIX (U-Boot, kernel, dtb)
