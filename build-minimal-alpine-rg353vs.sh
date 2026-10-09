@@ -15,7 +15,7 @@
 # init/do_mounts.c and initramfs has no /root, so the mount fails with error -2 and the kernel
 # panics. The root-mountpoint.cpio below is an initrd that contains only an empty /root directory.
 #
-# Env: ROCKNIX_TAG ("latest" or version e.g. "20260901")  ROCKNIX_IMG  ALPINE_TAR  ALPINE_BRANCH ("latest" or version e.g. "v3.24")  ALPINE_MIRROR ROOT_MB (512)  ROOT_PASSWORD (alpine)  HOSTNAME_ (rg353vs)  CACHE_DIR (./rg-cache)  WORKDIR (.)
+# Env: ROCKNIX_TAG ("latest" or version e.g. "20260901")  ROCKNIX_IMG  ALPINE_TAR  ALPINE_BRANCH ("latest-stable" or version e.g. "v3.24")  ALPINE_MIRROR ROOT_MB (512)  ROOT_PASSWORD (alpine)  HOSTNAME_ (rg353vs)  CACHE_DIR (./rg-cache)  WORKDIR (.)
 # Host tools: curl sfdisk mtools dosfstools e2fsprogs openssl gzip tar (git for the GitHub fallback)
 set -euo pipefail
 die() { echo "error: $*" >&2; exit 1; }
@@ -24,7 +24,7 @@ say() { printf '\n==> %s\n' "$*"; }
 
 OUT=${1:-alpine-rg353vs-minimal.img}
 ROCKNIX_TAG=${ROCKNIX_TAG:-20260901}  # set to desired version or "latest"
-ALPINE_BRANCH=${ALPINE_BRANCH:-v3.24} # set to desired version or "latest"
+ALPINE_BRANCH=${ALPINE_BRANCH:-v3.24} # set to desired version or "latest-stable"
 ROOT_MB=${ROOT_MB:-512}
 ROOT_PASSWORD=${ROOT_PASSWORD:-alpine}
 HOSTNAME_=${HOSTNAME_:-rg353vs}
