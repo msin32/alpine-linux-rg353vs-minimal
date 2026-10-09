@@ -1,5 +1,5 @@
 #!/bin/bash
-# build-bare-alpine-rg353vs.sh - minimal flashable Alpine Linux image for Anbernic RG353VS (RK3566).
+# build-minimal-alpine-rg353vs.sh - minimal flashable Alpine Linux image for Anbernic RG353VS (RK3566).
 # boots to shell login on the LCD (tty1, needs a USB keyboard)
 # debug: UART2 (ttyS2, 1500000 baud).
 #
