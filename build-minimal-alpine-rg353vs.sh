@@ -91,7 +91,7 @@ ensure_rocknix() {
     say "downloading ROCKNIX $ROCKNIX_TAG (~1.4 GB; resumable; deleted after extraction)"
     curl -fL --retry 5 --retry-delay 3 -C - -o "$src" "$url" || die "download failed: $url"
     gzip -t "$src" || { rm -f "$src"; die "downloaded file is corrupt (deleted): rerun to retry"; }
-    extract_rocknix_files "$src" delete
+    extract_rocknix_files "$src" delete # omit "delete" to keep full downloads
     rmdir "$CACHE/download" 2>/dev/null || true
   else
     say "extracting ROCKNIX files from $src"
