@@ -7,5 +7,5 @@ Minimal Alpine Linux (minirootfs) port for the Anbernic RG353VS using ROCKNIX ke
 ```
 
 ```shell
-gunzip -c alpine-rg353vs-minimal.img.gz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress
+gunzip -c alpine-rg353vs-minimal.img.gz | sudo dd of=/dev/mmcblkX bs=4M conv=fsync status=progress
 ```
