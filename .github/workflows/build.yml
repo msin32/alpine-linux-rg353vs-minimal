@@ -1,0 +1,106 @@
+name: Build Alpine RG353VS image
+
+on:
+  # Manual trigger from the Actions tab, with optional overrides.
+  workflow_dispatch:
+    inputs:
+      rocknix_tag:
+        description: 'ROCKNIX release tag (e.g. 20260901, or "latest")'
+        required: false
+        default: '20260901'
+      alpine_branch:
+        description: 'Alpine branch (e.g. v3.24, latest-stable, edge)'
+        required: false
+        default: 'v3.24'
+      root_mb:
+        description: 'Root partition size in MiB'
+        required: false
+        default: '512'
+      root_password:
+        description: 'Root password for the image'
+        required: false
+        default: 'alpine'
+  # Pushing a v* tag also builds and publishes a release.
+  push:
+    tags:
+      - 'v*'
+
+# Needed for softprops/action-gh-release to create a release.
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    # Defaults; workflow_dispatch inputs override them, and on tag pushes the
+    # workflow_dispatch inputs are empty so the defaults apply.
+    env:
+      SCRIPT: build-bare-alpine-rg353vs.sh
+      ROCKNIX_TAG: ${{ github.event.inputs.rocknix_tag || '20260901' }}
+      ALPINE_BRANCH: ${{ github.event.inputs.alpine_branch || 'v3.24' }}
+      ROOT_MB: ${{ github.event.inputs.root_mb || '512' }}
+      ROOT_PASSWORD: ${{ github.event.inputs.root_password || 'alpine' }}
+      CACHE_DIR: ${{ github.workspace }}/rg-cache
+      OUT_IMG: alpine-rg353vs-bare.img
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Checks for: curl sfdisk mcopy mmd mkfs.vfat mke2fs openssl gzip tar
+      # (git is needed only for GitHub fallback, uuidgen for sfdisk partition UUIDs).
+      - name: Install host tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            curl \
+            uuid-runtime \
+            fdisk \
+            mtools \
+            dosfstools \
+            e2fsprogs \
+            openssl \
+            gzip \
+            tar \
+            git
+
+      # Cache the extracted ROCKNIX files (~30 MB: KERNEL, DTB, u-boot.bin) and the
+      # Alpine minirootfs tarball, so reruns skip the ~1.4 GB ROCKNIX download.
+      # Keyed by tag + branch so a version change starts a fresh cache.
+      - name: Cache ROCKNIX files and Alpine minirootfs
+        uses: actions/cache@v4
+        with:
+          path: |
+            rg-cache/rocknix-*
+            rg-cache/alpine-minirootfs-*-aarch64.tar.gz
+          key: rg353vs-${{ env.ROCKNIX_TAG }}-${{ env.ALPINE_BRANCH }}
+          restore-keys: |
+            rg353vs-${{ env.ROCKNIX_TAG }}-
+            rg353vs-
+
+      - name: Build the image
+        run: |
+          chmod +x "$SCRIPT"
+          ./"$SCRIPT" "$OUT_IMG"
+
+      - name: Show the result
+        run: |
+          ls -lh "$OUT_IMG".gz
+          sha256sum "$OUT_IMG".gz
+
+      - name: Upload the image as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpine-rg353vs-bare
+          path: alpine-rg353vs-bare.img.gz
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach the image to a release (tag pushes only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: alpine-rg353vs-bare.img.gz
+          generate_release_notes: true
