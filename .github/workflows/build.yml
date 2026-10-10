@@ -37,13 +37,13 @@ jobs:
     # Defaults; workflow_dispatch inputs override them, and on tag pushes the
     # workflow_dispatch inputs are empty so the defaults apply.
     env:
-      SCRIPT: build-bare-alpine-rg353vs.sh
+      SCRIPT: build-minimal-alpine-rg353vs.sh
       ROCKNIX_TAG: ${{ github.event.inputs.rocknix_tag || '20260901' }}
       ALPINE_BRANCH: ${{ github.event.inputs.alpine_branch || 'v3.24' }}
       ROOT_MB: ${{ github.event.inputs.root_mb || '512' }}
       ROOT_PASSWORD: ${{ github.event.inputs.root_password || 'alpine' }}
       CACHE_DIR: ${{ github.workspace }}/rg-cache
-      OUT_IMG: alpine-rg353vs-bare.img
+      OUT_IMG: alpine-rg353vs-minimal.img
 
     steps:
       - name: Checkout
@@ -93,8 +93,8 @@ jobs:
       - name: Upload the image as a workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: alpine-rg353vs-bare
-          path: alpine-rg353vs-bare.img.gz
+          name: alpine-rg353vs-minimal
+          path: alpine-rg353vs-minimal.img.gz
           if-no-files-found: error
           retention-days: 30
 
@@ -102,5 +102,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: alpine-rg353vs-bare.img.gz
+          files: alpine-rg353vs-minimal.img.gz
           generate_release_notes: true
