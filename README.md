@@ -1,5 +1,5 @@
 # alpine-linux-rg353vs-minimal
-Minimal Alpine Linux port to Anbernic RG353VS using ROCKNIX kernel.
+Minimal Alpine Linux (minirootfs) port for the Anbernic RG353VS using ROCKNIX kernel.
 
 # Usage
 ```bash 
